@@ -1,0 +1,5 @@
+[app_servers]
+demo_server ansible_host={{ lookup('env', 'APP_DOMAIN') }} ansible_user=carloscardozo
+
+[app_servers:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'

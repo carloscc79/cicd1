@@ -1,0 +1,56 @@
+---
+- name: Despliegue Seguro de la App Demo
+  hosts: app_servers
+  become: true
+  vars:
+    app_dir: /opt/demo-app
+    deploy:
+      user: root
+      group: root
+
+  tasks:
+    - name: 1. Asegurar que el directorio raíz de la aplicación exista
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ deploy.user }}"
+        group: "{{ deploy.group }}"
+        mode: '0755'
+
+    # =========================================================================
+    # Crear carpeta local para persistencia de PostgreSQL
+    # =========================================================================
+    - name: 1b. Asegurar que la carpeta local de la base de datos exista
+      file:
+        path: "{{ app_dir }}/data/postgres"
+        state: directory
+        owner: "999"      # UID estándar del contenedor oficial de PostgreSQL
+        group: "999"      # GID estándar de PostgreSQL
+        mode: '0700'      # Solo acceso para el motor de BD (Seguridad/Hardening)
+
+    - name: 2. Generar archivo .env restringido desde la plantilla Jinja2
+      template:
+        src: templates/env.j2
+        dest: "{{ app_dir }}/.env"
+        owner: "{{ deploy.user }}"
+        group: "{{ deploy.group }}"
+        mode: '0600'
+
+    - name: 3. Renderizar archivo docker-compose.yml
+      template:
+        src: templates/docker-compose.yml.j2
+        dest: "{{ app_dir }}/docker-compose.yml"
+        owner: "{{ deploy.user }}"
+        group: "{{ deploy.group }}"
+        mode: '0644'
+
+    - name: 4. Descargar la nueva versión de la imagen Docker
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+        pull: missing
+
+    - name: 5. Reiniciar servicios con la nueva versión
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: restarted

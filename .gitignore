@@ -1,0 +1,17 @@
+# Entornos virtuales de Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Variables de entorno con secretos
+.env
+infra/ansible/.env
+
+# Archivos de estado o temporales de Ansible/Docker
+*.retry
+.DS_Store
+
+# Datos persistentes locales de la base de datos
+infra/ansible/data/
+/opt/demo-app/data/
