@@ -16,7 +16,7 @@ jobs:
   # ==========================================
   code-quality-and-test:
     name: 1. Calidad de Código y Pruebas
-    runs-on: self-hosted
+    runs-on: act
     steps:
       - name: Checkout del código
         uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
 
   security-scan:
     name: 2. Escaneo de Vulnerabilidades (SAST)
-    runs-on: self-hosted
+    runs-on: act
     steps:
       - name: Checkout del código
         uses: actions/checkout@v3
@@ -58,7 +58,7 @@ jobs:
   build-and-push:
     name: 3. Construir y Publicar Imagen Docker
     needs: [code-quality-and-test, security-scan]
-    runs-on: self-hosted
+    runs-on: act
     steps:
       - name: Checkout del código
         uses: actions/checkout@v3
@@ -95,7 +95,7 @@ jobs:
     name: 4. Despliegue con Ansible
     needs: [build-and-push]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: self-hosted
+    runs-on: act
     steps:
       - name: Checkout del código
         uses: actions/checkout@v3
@@ -122,7 +122,7 @@ jobs:
   smoke-test:
     name: 5. Verificación POST-Despliegue (Smoke Test)
     needs: [deploy-to-staging]
-    runs-on: self-hosted
+    runs-on: act
     steps:
       - name: Validar Endpoint de la Aplicación
         run: |
