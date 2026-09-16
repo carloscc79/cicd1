@@ -11,9 +11,9 @@ env:
   IMAGE_NAME: desarrollo/demo-app
 
 jobs:
-  # ==========================================
+  
   # FASE 1: INTEGRACIÓN CONTINUA (CI)
-  # ==========================================
+  
   code-quality-and-test:
     name: 1. Calidad de Código y Pruebas
     runs-on: act
@@ -88,9 +88,9 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # ==========================================
+  
   # FASE 2: DESPLIEGUE CONTINUO (CD)
-  # ==========================================
+  
   deploy-to-staging:
     name: 4. Despliegue con Ansible
     needs: [build-and-push]
@@ -130,7 +130,7 @@ jobs:
           for i in {1..6}; do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.APP_DOMAIN }}:8080/ || true)
             if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 302 ]; then
-              echo "✅ El servicio respondió HTTP $HTTP_STATUS. Despliegue Exitoso."
+              echo "El servicio respondió HTTP $HTTP_STATUS. Despliegue Exitoso."
               exit 0
             fi
             echo "Intento $i: Servicio respondiendo HTTP $HTTP_STATUS. Esperando 5 segundos..."
