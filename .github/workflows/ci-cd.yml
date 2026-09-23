@@ -113,7 +113,7 @@ jobs:
           ansible-playbook -i infra/ansible/inventory.ini infra/ansible/playbook.yml \
             -e "target_host=${{ secrets.APP_DOMAIN }}" \
             -e "ansible_port=${{ secrets.APP_PORT }}" \
-            -e "image_tag=${{ github.sha }}" \
+            -e "image_tag=${{ GITHUB_SHA::7 }}" \
             -e "db_password=${{ secrets.DB_PASSWORD }}" \
             -e "registry_user=${{ github.actor }}" \
             -e "registry_token=${{ secrets.GITHUB_TOKEN }}" \
