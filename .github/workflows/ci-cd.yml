@@ -116,7 +116,9 @@ jobs:
             -e "image_tag=${{ github.sha }}" \
             -e "db_password=${{ secrets.DB_PASSWORD }}" \
             -e "registry_user=${{ github.actor }}" \
-            -e "registry_token=${{ secrets.GITHUB_TOKEN }}"
+            -e "registry_token=${{ secrets.GITHUB_TOKEN }}" \
+            -e "registry_url=${{ env.REGISTRY }}" \
+            -e "image_name=${{ env.IMAGE_NAME }}"
 
   smoke-test:
     name: 5. Verificación POST-Despliegue (Smoke Test)
