@@ -139,7 +139,7 @@ jobs:
           echo "Verificando disponibilidad del servicio vía SSH en el puerto 8080..."
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.APP_PORT }} carloscardozo@${{ secrets.APP_DOMAIN }} '
             for i in {1..6}; do
-              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || true)
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/docs || true)
               if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 302 ]; then
                 echo "El servicio respondió HTTP $HTTP_STATUS en localhost:8080. Despliegue Exitoso."
                 exit 0
