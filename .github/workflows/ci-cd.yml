@@ -78,7 +78,7 @@ jobs:
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Compilar y Publicar Imagen Docker
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./app
           file: ./app/Dockerfile
@@ -123,18 +123,24 @@ jobs:
     needs: [deploy-to-staging]
     runs-on: ubuntu-latest
     steps:
-      - name: Validar Endpoint de la Aplicación
+      - name: Configurar Llave SSH para Verificación Local
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Validar Endpoint de la Aplicación en Servidor
         run: |
-          echo "Verificando disponibilidad del servicio en http://${{ secrets.APP_DOMAIN }}:8080/..."
-          for i in {1..6}; do
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.APP_DOMAIN }}:8080/ || true)
-            if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 302 ]; then
-              echo "El servicio respondió HTTP $HTTP_STATUS. Despliegue Exitoso."
-              exit 0
-            fi
-            echo "Intento $i: Servicio respondiendo HTTP $HTTP_STATUS. Esperando 5 segundos..."
-            sleep 5
-          done
-          
-          echo "ERROR: El servicio no respondió HTTP 200 a tiempo."
-          exit 1
+          echo "Verificando disponibilidad del servicio vía SSH en el puerto 8080..."
+          ssh -o StrictHostKeyChecking=no -p ${{ secrets.APP_PORT }} carloscardozo@${{ secrets.APP_DOMAIN }} '
+            for i in {1..6}; do
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || true)
+              if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 302 ]; then
+                echo "El servicio respondió HTTP $HTTP_STATUS en localhost:8080. Despliegue Exitoso."
+                exit 0
+              fi
+              echo "Intento $i: Estado HTTP $HTTP_STATUS. Esperando 5 segundos..."
+              sleep 5
+            done
+            echo "ERROR: El servicio no respondió HTTP 200 a tiempo."
+            exit 1
+          '
