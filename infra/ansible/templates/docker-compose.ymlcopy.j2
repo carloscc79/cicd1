@@ -18,7 +18,7 @@ services:
       - "5432:5432"
 
   web:
-    image: ghcr.io/{{ registry_user | lower }}/cicd1:{{ image_tag }}
+    image: ${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}
     container_name: demo_web
     restart: always
     environment:
