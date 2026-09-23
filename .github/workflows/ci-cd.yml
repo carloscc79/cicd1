@@ -12,7 +12,7 @@ env:
 
 jobs:
   # ==========================================
-  # FASE 1: INTEGRACIÓN CONTINUA (CI)
+  # FASE 1: INTEGRACIÓN CONTINUA (CI).
   # ==========================================
   code-quality-and-test:
     name: 1. Calidad de Código y Pruebas
